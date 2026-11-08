@@ -707,7 +707,11 @@ Yatra Saathi was developed as a technology solution aimed at making travel acros
 # 👥 Project Team
 
 **Team:** Travel Techies
+
+
 **Author:** Sneha Ghosh
+
+
 **Project:** Yatra Saathi – Tourist Safety Portal
 
 ---
