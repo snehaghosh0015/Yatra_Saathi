@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YatraSaathi – Tourist Safety & Assistance for India</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Scroll Progress Bar -->
+  <div class="scroll-progress" id="scrollProgress"><div class="scroll-progress-bar" id="scrollProgressBar"></div></div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <a href="#" class="nav-brand"><i class="fas fa-om"></i> YatraSaathi</a>
+    <div class="nav-links" id="navLinks">
+      <a href="#features" data-i18n="nav_features">Features</a>
+      <a href="#map-section" data-i18n="nav_map">Live Map</a>
+      <a href="#route-section">Route</a>
+      <a href="#alerts-section">Alerts</a>
+      <a href="#danger-zones" data-i18n="nav_zones">Danger Zones</a>
+      <a href="#emergency" data-i18n="nav_emergency">Emergency</a>
+      <a href="#translator" data-i18n="nav_translator">Translator</a>
+      <a href="javascript:void(0)" onclick="toggleChatbot()" style="color:#6c5ce7;font-weight:600"><i class="fas fa-robot"></i> YatraGuide</a>
+      <select class="lang-select" id="langSelect" aria-label="Select language">
+        <option value="en">🇬🇧 English</option>
+        <option value="hi">🇮🇳 हिन्दी</option>
+        <option value="bn">🇮🇳 বাংলা</option>
+        <option value="te">🇮🇳 తెలుగు</option>
+        <option value="ta">🇮🇳 தமிழ்</option>
+        <option value="mr">🇮🇳 मराठी</option>
+        <option value="gu">🇮🇳 ગુજરાતી</option>
+        <option value="kn">🇮🇳 ಕನ್ನಡ</option>
+        <option value="ml">🇮🇳 മലയാളം</option>
+        <option value="pa">🇮🇳 ਪੰਜਾਬੀ</option>
+        <option value="or">🇮🇳 ଓଡ଼ିଆ</option>
+        <option value="as">🇮🇳 অসমীয়া</option>
+        <option value="ur">🇮🇳 اردو</option>
+        <option value="sa">🇮🇳 संस्कृतम्</option>
+        <option value="ne">🇮🇳 नेपाली</option>
+        <option value="mai">🇮🇳 मैथिली</option>
+        <option value="sat">🇮🇳 ᱥᱟᱱᱛᱟᱲᱤ</option>
+        <option value="ks">🇮🇳 कॉशुर</option>
+        <option value="doi">🇮🇳 डोगरी</option>
+        <option value="mni">🇮🇳 ꯃꯩꯇꯩꯂꯥꯏ</option>
+      </select>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle dark/light theme">
+        <i class="fas fa-moon moon-icon"></i>
+        <i class="fas fa-sun sun-icon"></i>
+      </button>
+    </div>
+    <div class="user-welcome" id="userWelcome" onclick="toggleProfile()">
+        <div class="user-avatar" id="userAvatar"></div>
+        <span id="userDisplayName"></span>
+        <i class="fas fa-chevron-down" style="font-size:0.7rem"></i>
+      </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu"><i class="fas fa-bars"></i></button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-content">
+      <h1 data-i18n="hero_title">Your Safety,<br/>Our <span>Mission</span></h1>
+      <p data-i18n="hero_sub">India's most comprehensive tourist safety platform. Break language barriers, find help instantly, and explore with confidence — from Kashmir to Kanyakumari.</p>
+      <div class="hero-btns">
+        <a href="#map-section" class="btn btn-primary"><i class="fas fa-map-marked-alt"></i> <span data-i18n="hero_explore">Explore Map</span></a>
+        <button class="btn btn-sos" onclick="openSOS()"><i class="fas fa-exclamation-triangle"></i> <span data-i18n="hero_sos">SOS Emergency</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="section-header">
+      <span class="badge badge-orange" data-i18n="feat_badge">WHY YATRASAATHI</span>
+      <h2 data-i18n="feat_title">Everything a Tourist Needs</h2>
+      <p data-i18n="feat_sub">Built for the incredible diversity of India, designed to keep every traveler safe and connected.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon fi-orange"><i class="fas fa-language"></i></div>
+        <h3 data-i18n="f1_title">20+ Indian Languages</h3>
+        <p data-i18n="f1_desc">Communicate in your native language. Real-time translation across all major Indian languages.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon fi-blue"><i class="fas fa-satellite-dish"></i></div>
+        <h3 data-i18n="f2_title">Live GPS Tracking</h3>
+        <p data-i18n="f2_desc">Share your real-time location with loved ones and authorities for instant assistance.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon fi-red"><i class="fas fa-exclamation-circle"></i></div>
+        <h3 data-i18n="f3_title">Danger Zone Alerts</h3>
+        <p data-i18n="f3_desc">Real-time warnings about terrorism, landslides, floods, earthquakes, and more.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon fi-green"><i class="fas fa-hospital"></i></div>
+        <h3 data-i18n="f4_title">Nearby Services</h3>
+        <p data-i18n="f4_desc">Find hotels, hospitals, police stations, and restaurants instantly on the map.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon fi-yellow"><i class="fas fa-phone-alt"></i></div>
+        <h3 data-i18n="f5_title">Emergency Contacts</h3>
+        <p data-i18n="f5_desc">One-tap access to Police, Ambulance, Fire, Tourist Helpline, and Women's Helpline.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon fi-purple"><i class="fas fa-shield-alt"></i></div>
+        <h3 data-i18n="f6_title">SOS Alert</h3>
+        <p data-i18n="f6_desc">Instant SOS system that shares your location and alerts local authorities immediately.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAP SECTION -->
+  <section id="map-section">
+    <div class="section-header">
+      <span class="badge badge-orange" data-i18n="map_badge">INTERACTIVE MAP</span>
+      <h2 data-i18n="map_title">Explore India Safely</h2>
+      <p data-i18n="map_sub">Real-time danger zones, nearby services, and your live location — all in one map.</p>
+    </div>
+    <div class="map-wrapper">
+      <div id="map"></div>
+      <div class="map-sidebar">
+        <h3><i class="fas fa-crosshairs" style="color:var(--accent)"></i> <span data-i18n="sb_location">Your Location</span></h3>
+        <button class="location-btn" id="trackBtn" onclick="toggleTracking()">
+          <i class="fas fa-satellite-dish"></i>
+          <span data-i18n="sb_start">Start Live Tracking</span>
+        </button>
+        <div id="coords" style="font-size:0.8rem;color:var(--text-light);margin-bottom:16px;text-align:center;">
+          <span data-i18n="sb_noloc">Location not available</span>
+        </div>
+
+        <div class="nearby-panel">
+          <h4><i class="fas fa-search-location" style="color:var(--primary)"></i> <span data-i18n="sb_nearby">Find Nearby</span></h4>
+          <div class="nearby-btns">
+            <button class="nearby-btn" onclick="searchNearby('hotel')">
+              <i class="fas fa-hotel" style="color:var(--accent)"></i>
+              <span data-i18n="sb_hotel">Hotels</span>
+            </button>
+            <button class="nearby-btn" onclick="searchNearby('hospital')">
+              <i class="fas fa-hospital" style="color:var(--success)"></i>
+              <span data-i18n="sb_hospital">Hospitals</span>
+            </button>
+            <button class="nearby-btn" onclick="searchNearby('police')">
+              <i class="fas fa-shield-alt" style="color:var(--accent)"></i>
+              <span data-i18n="sb_police">Police</span>
+            </button>
+            <button class="nearby-btn" onclick="searchNearby('restaurant')">
+              <i class="fas fa-utensils" style="color:var(--primary)"></i>
+              <span data-i18n="sb_restaurant">Restaurants</span>
+            </button>
+            <button class="nearby-btn" onclick="searchNearby('pharmacy')">
+              <i class="fas fa-pills" style="color:#9c27b0"></i>
+              <span>Pharmacies</span>
+            </button>
+            <button class="nearby-btn" onclick="searchNearby('atm')">
+              <i class="fas fa-money-check-alt" style="color:#00897b"></i>
+              <span>ATMs</span>
+            </button>
+            <button class="nearby-btn" onclick="searchNearby('fuel')">
+              <i class="fas fa-gas-pump" style="color:#e65100"></i>
+              <span>Fuel Stations</span>
+            </button>
+            <button class="nearby-btn" onclick="searchNearby('cafe')">
+              <i class="fas fa-coffee" style="color:#6d4c41"></i>
+              <span>Cafes</span>
+            </button>
+            <button class="nearby-btn" onclick="searchNearby('lodging')">
+              <i class="fas fa-bed" style="color:#5c6bc0"></i>
+              <span>Lodging</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="danger-legend">
+          <h4><i class="fas fa-exclamation-triangle"></i> <span data-i18n="sb_legend">Danger Zones</span></h4>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#d32f2f"></div>
+            <span data-i18n="lg_high">High Risk — Avoid travel</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#f57c00"></div>
+            <span data-i18n="lg_med">Medium Risk — Travel with caution</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#fdd835"></div>
+            <span data-i18n="lg_low">Low Risk — Stay informed</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#2196f3"></div>
+            <span data-i18n="lg_safe">Safe Zone — Popular tourist area</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROUTE PLANNER -->
+  <section id="route-section">
+    <div class="section-header">
+      <span class="badge badge-orange">🗺️ ROUTE PLANNER</span>
+      <h2>Plan Your Journey</h2>
+      <p>Get directions, estimated travel time, and road safety info between any two Indian cities.</p>
+    </div>
+    <div class="route-box" style="max-width:1200px;margin:0 auto;padding:0 24px;">
+      <div class="route-form">
+        <h3><i class="fas fa-route" style="color:var(--primary)"></i> Route Details</h3>
+        <div class="form-group">
+          <label>From (Current Location / City)</label>
+          <input type="text" id="routeFrom" placeholder="e.g. Delhi" />
+        </div>
+        <div class="form-group">
+          <label>To (Destination)</label>
+          <input type="text" id="routeTo" placeholder="e.g. Jaipur" />
+        </div>
+        <div class="form-group">
+          <label>Travel Mode</label>
+          <select id="routeMode">
+            <option value="driving">🚗 Driving</option>
+            <option value="train">🚆 Train</option>
+            <option value="plane">✈️ Flight</option>
+            <option value="transit">🚌 Public Transit</option>
+            <option value="bicycling">🚴 Cycling</option>
+            <option value="walking">🚶 Walking</option>
+          </select>
+        </div>
+        <button class="form-submit" onclick="planRoute()"><i class="fas fa-directions"></i> Get Directions</button>
+        <button class="form-submit" style="margin-top:8px;background:linear-gradient(135deg,#4285f4,#34a853)" onclick="openGoogleMaps()"><i class="fab fa-google"></i> Open in Google Maps</button>
+        <div class="route-info" id="routeInfo">
+          <div id="routeDetails"></div>
+          <a id="routeGmaps" href="#" target="_blank" style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;color:var(--success);font-weight:600;text-decoration:none">
+            <i class="fas fa-external-link-alt"></i> Open in Google Maps
+          </a>
+        </div>
+      </div>
+      <div id="routeMap" style="width:100%;height:480px;border-radius:var(--radius);box-shadow:var(--shadow);border:2px solid rgba(0,0,0,0.06);background:#e8e8e8;display:flex;align-items:center;justify-content:center;">
+        <div style="text-align:center;color:#aaa"><i class="fas fa-map-marked-alt" style="font-size:3rem;margin-bottom:12px;display:block;opacity:0.4"></i><p style="font-size:0.9rem">Enter origin & destination, then click Get Directions</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ALERTS PANEL -->
+  <section id="alerts-section">
+    <div class="section-header">
+      <span class="badge badge-orange">🔔 LIVE ALERTS</span>
+      <h2>Real-Time Safety & Travel Alerts</h2>
+      <p>Weather disruptions, accessibility information, and overcrowding updates for your destination.</p>
+    </div>
+    <div class="alerts-grid" id="alertsGrid" style="max-width:1200px;margin:0 auto;padding:0 24px;">
+      <!-- Weather Alerts -->
+      <div class="alert-card weather">
+        <div class="alert-card-header">
+          <div class="alert-icon"><i class="fas fa-cloud-sun-rain"></i></div>
+          <div>
+            <h3>Weather Disruption Warnings</h3>
+            <p>Real-time weather alerts affecting travel plans</p>
+          </div>
+        </div>
+        <div class="alert-items" id="weatherAlerts"></div>
+      </div>
+
+      <!-- Accessibility Info -->
+      <div class="alert-card accessibility">
+        <div class="alert-card-header">
+          <div class="alert-icon"><i class="fas fa-wheelchair"></i></div>
+          <div>
+            <h3>Accessibility Information</h3>
+            <p>For differently-abled tourists — accessibility ratings & facilities</p>
+          </div>
+        </div>
+        <div class="alert-items" id="accessAlerts"></div>
+      </div>
+
+      <!-- Overcrowding Alerts -->
+      <div class="alert-card crowding">
+        <div class="alert-card-header">
+          <div class="alert-icon"><i class="fas fa-users"></i></div>
+          <div>
+            <h3>Overcrowding Alerts</h3>
+            <p>Real-time crowd density at popular tourist spots</p>
+          </div>
+        </div>
+        <div class="alert-items" id="crowdAlerts"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DANGER ZONES -->
+  <section id="danger-zones">
+    <div class="section-header">
+      <span class="badge badge-orange" data-i18n="dz_badge">SAFETY ALERTS</span>
+      <h2 data-i18n="dz_title">Danger Zones Across India</h2>
+      <p data-i18n="dz_sub">Stay informed about regions with potential threats before you travel.</p>
+    </div>
+    <div class="zones-grid" id="zonesGrid"></div>
+  </section>
+
+  <!-- EMERGENCY CONTACTS -->
+  <section id="emergency">
+    <div class="section-header">
+      <span class="badge" style="background:rgba(255,255,255,0.2);color:#fff" data-i18n="em_badge">EMERGENCY</span>
+      <h2 data-i18n="em_title">Need Help? We're Here.</h2>
+      <p data-i18n="em_sub">Critical contacts that could save your life. Save them before you travel.</p>
+    </div>
+    <div class="emergency-grid" id="emergencyGrid"></div>
+  </section>
+
+  <!-- TRANSLATOR -->
+  <section id="translator">
+    <div class="section-header">
+      <span class="badge" style="background:rgba(255,255,255,0.2);color:#fff" data-i18n="tr_badge">LANGUAGE BRIDGE</span>
+      <h2 data-i18n="tr_title">Instant Translation</h2>
+      <p data-i18n="tr_sub">Break the language barrier. Translate between any Indian languages instantly.</p>
+    </div>
+    <div class="translator-box" style="position:relative">
+      <!-- Loading overlay -->
+      <div class="translator-loading" id="transLoader">
+        <div class="spinner"></div>
+        <span>Translating...</span>
+      </div>
+
+      <!-- Language selector bar -->
+      <div class="lang-selector-bar">
+        <div class="lang-select-wrap">
+          <span class="lang-icon"><i class="fas fa-globe"></i></span>
+          <select id="transFrom"></select>
+        </div>
+        <button class="swap-btn" onclick="swapLangs()" title="Swap languages"><i class="fas fa-exchange-alt"></i></button>
+        <button class="v2v-btn" id="v2vBtn" onclick="voiceToVoice()" title="Voice-to-Voice: Speak → Translate → Listen"><i class="fas fa-headset"></i> <span>V2V</span></button>
+        <div class="lang-select-wrap">
+          <span class="lang-icon"><i class="fas fa-language"></i></span>
+          <select id="transTo"></select>
+        </div>
+      </div>
+
+      <!-- Split panels: Source | Output -->
+      <div class="translator-panels">
+        <!-- Source panel -->
+        <div class="translator-panel source">
+          <div class="translator-panel-header">
+            <span class="panel-label" data-i18n="tr_input_label">Input</span>
+            <div class="panel-actions">
+              <button class="panel-action-btn" onclick="clearInput()"><i class="fas fa-times"></i> Clear</button>
+              <button class="panel-action-btn" onclick="pasteInput()"><i class="fas fa-paste"></i> Paste</button>
+              <button class="voice-btn" id="voiceBtn" onclick="startVoiceInput()" title="Speak to translate"><i class="fas fa-microphone"></i></button>
+            </div>
+          </div>
+          <textarea id="transInput" placeholder="Type or paste text to translate..." oninput="updateCharCount()"></textarea>
+          <div class="panel-bottom-bar">
+            <div class="char-count">
+              <div class="char-count-bar"><div class="char-count-fill" id="charCountFill" style="width:0%"></div></div>
+              <span><span id="charCount">0</span>/500</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Output panel -->
+        <div class="translator-panel output-panel">
+          <div class="translator-panel-header">
+            <span class="panel-label" data-i18n="tr_output_label">Translation</span>
+            <div class="panel-actions">
+              <span class="confidence-badge" id="confidenceBadge"><i class="fas fa-check-circle"></i> <span id="confidenceText"></span></span>
+              <button class="panel-action-btn" onclick="copyTranslation()" title="Copy"><i class="fas fa-copy"></i> Copy</button>
+              <button class="panel-action-btn" onclick="speakTranslation()" title="Listen"><i class="fas fa-volume-up"></i> Listen</button>
+              <button class="panel-action-btn" onclick="shareTranslation()" title="Share"><i class="fas fa-share-alt"></i> Share</button>
+            </div>
+          </div>
+          <textarea id="transOutput" placeholder="Translation will appear here..." readonly></textarea>
+        </div>
+      </div>
+
+      <!-- Translate button bar -->
+      <div class="translate-action-bar">
+        <div style="display:flex;align-items:center;gap:16px">
+          <label class="auto-translate-label">
+            <input type="checkbox" id="autoTranslate" checked> Auto-translate on type
+          </label>
+          <span class="kbd-hint"><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>
+        </div>
+        <button class="translate-btn" onclick="translateText()" style="position:relative;overflow:hidden">
+          <span class="btn-shine"></span>
+          <i class="fas fa-language"></i>
+          <span data-i18n="tr_btn">Translate</span>
+        </button>
+      </div>
+
+      <!-- Quick phrases (horizontal scroll) -->
+      <div class="quick-phrases-section">
+        <div class="quick-phrases-header">
+          <h4><i class="fas fa-bolt"></i> <span data-i18n="tr_quick">Quick Phrases</span></h4>
+        </div>
+        <div class="quick-phrases-scroll" id="quickPhrases"></div>
+      </div>
+
+      <!-- History -->
+      <div class="translator-history" id="transHistory" style="display:none">
+        <h4><i class="fas fa-history"></i> Recent Translations</h4>
+        <div id="historyList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOS MODAL -->
+  <div class="sos-overlay" id="sosOverlay">
+    <div class="sos-modal">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h2 data-i18n="sos_title">Emergency SOS</h2>
+      <p data-i18n="sos_desc">Your location will be shared with emergency services immediately.</p>
+      <span class="sos-number">112</span>
+      <div class="sos-actions">
+        <a href="tel:112" class="btn btn-sos" id="sosCall"><i class="fas fa-phone"></i> <span data-i18n="sos_call">Call 112</span></a>
+        <button class="btn" style="background:#f0f0f0;color:var(--text)" onclick="closeSOS()"><span data-i18n="sos_cancel">Cancel</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRACKING BANNER -->
+  <div class="tracking-banner" id="trackingBanner">
+    <i class="fas fa-satellite-dish"></i>
+    <span data-i18n="track_active">Live tracking active — sharing your location</span>
+    <button onclick="toggleTracking()" style="background:none;border:none;color:#fff;cursor:pointer;font-size:1rem;margin-left:8px"><i class="fas fa-times"></i></button>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <i class="fas fa-check-circle" style="color:var(--success)"></i>
+    <span class="toast-text" id="toastText"></span>
+    <button class="toast-close" onclick="hideToast()"><i class="fas fa-times"></i></button>
+  </div>
+
+  <!-- LOGIN / REGISTRATION MODAL -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-card">
+      <div class="login-brand">
+        <i class="fas fa-om"></i>
+        <h2>YatraSaathi</h2>
+        <p>Your Safety, Our Mission</p>
+      </div>
+      <div class="login-tabs">
+        <button class="login-tab active" onclick="switchLoginTab('login')">Login</button>
+        <button class="login-tab" onclick="switchLoginTab('register')">Register</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div class="login-form active" id="loginForm">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="loginName" placeholder="Enter your name" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="password-toggle">
+            <input type="password" id="loginPass" placeholder="Enter password" />
+            <button onclick="togglePass('loginPass',this)" type="button"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+        <button class="form-submit" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Login</button>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div class="login-form" id="registerForm">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" id="regName" placeholder="Your full name" required />
+        </div>
+        <div class="form-group">
+          <label>Password *</label>
+          <div class="password-toggle">
+            <input type="password" id="regPass" placeholder="Create a password" required />
+            <button onclick="togglePass('regPass',this)" type="button"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nationality *</label>
+            <select id="regNationality">
+              <option value="">Select</option>
+              <option value="Indian">Indian</option>
+              <option value="American">American</option>
+              <option value="British">British</option>
+              <option value="Canadian">Canadian</option>
+              <option value="Australian">Australian</option>
+              <option value="German">German</option>
+              <option value="French">French</option>
+              <option value="Japanese">Japanese</option>
+              <option value="Chinese">Chinese</option>
+              <option value="South Korean">South Korean</option>
+              <option value="Brazilian">Brazilian</option>
+              <option value="Russian">Russian</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Local Language *</label>
+            <select id="regLang">
+              <option value="en">English</option>
+              <option value="hi">Hindi</option>
+              <option value="bn">Bengali</option>
+              <option value="te">Telugu</option>
+              <option value="ta">Tamil</option>
+              <option value="mr">Marathi</option>
+              <option value="gu">Gujarati</option>
+              <option value="kn">Kannada</option>
+              <option value="ml">Malayalam</option>
+              <option value="pa">Punjabi</option>
+              <option value="or">Odia</option>
+              <option value="as">Assamese</option>
+              <option value="ur">Urdu</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Current Location</label>
+            <input type="text" id="regLocation" placeholder="e.g. Delhi" />
+          </div>
+          <div class="form-group">
+            <label>Destination *</label>
+            <input type="text" id="regDest" placeholder="e.g. Jaipur" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Budget (per day in ₹)</label>
+          <select id="regBudget">
+            <option value="">Select budget range</option>
+            <option value="budget">Budget (₹500–1500)</option>
+            <option value="mid-range">Mid-Range (₹1500–5000)</option>
+            <option value="premium">Premium (₹5000–15000)</option>
+            <option value="luxury">Luxury (₹15000+)</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Emergency Contact Name</label>
+            <input type="text" id="regEmergName" placeholder="e.g. Ravi Sharma" />
+          </div>
+          <div class="form-group">
+            <label>Emergency Contact Phone *</label>
+            <input type="tel" id="regEmergency" placeholder="e.g. +91 9876543210" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Emergency Contact Relationship</label>
+          <select id="regEmergRel">
+            <option value="">Select</option>
+            <option value="parent">Parent</option>
+            <option value="spouse">Spouse</option>
+            <option value="sibling">Sibling</option>
+            <option value="friend">Friend</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Passport / ID Number</label>
+            <input type="text" id="regPassport" placeholder="e.g. A1234567" />
+          </div>
+          <div class="form-group">
+            <label>Blood Group</label>
+            <select id="regBlood">
+              <option value="">Select</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Accessibility Needs</label>
+          <select id="regAccess">
+            <option value="none">None</option>
+            <option value="wheelchair">♿ Wheelchair User</option>
+            <option value="visual">👁️ Visual Impairment</option>
+            <option value="hearing">👂 Hearing Impairment</option>
+            <option value="mobility">🦯 Limited Mobility</option>
+            <option value="elderly">🧓 Senior Citizen</option>
+            <option value="other">📋 Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Data Privacy Notice</label>
+          <div style="background:rgba(0,119,182,0.08);border-radius:8px;padding:10px 14px;font-size:0.78rem;color:var(--text-light);margin-bottom:8px">
+            🔒 Your personal data (passport, emergency contacts, location) is stored <strong>locally on this device only</strong>. It is never sent to any server. You can delete all data at any time by clicking "Clear All Data" in settings.
+          </div>
+        </div>
+        <div class="form-checkbox">
+          <input type="checkbox" id="regTerms" />
+          <label for="regTerms">I agree to the safety terms and data usage policy</label>
+        </div>
+        <button class="form-submit" onclick="doRegister()" style="margin-top:12px"><i class="fas fa-user-plus"></i> Register & Start Exploring</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- USER PROFILE DROPDOWN -->
+  <div class="profile-dropdown" id="profileDropdown">
+    <h4><i class="fas fa-user-circle" style="color:var(--primary)"></i> Your Profile</h4>
+    <!-- View Mode -->
+    <div id="profileView">
+      <div id="profileInfo"></div>
+      <button class="profile-edit-btn" onclick="toggleEditProfile(true)"><i class="fas fa-pen"></i> Edit Profile</button>
+      <button class="logout-btn" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+    <!-- Edit Mode -->
+    <div id="profileEdit" style="display:none">
+      <div class="edit-field">
+        <label>Current Location</label>
+        <input type="text" id="editLocation" placeholder="e.g. Delhi" />
+      </div>
+      <div class="edit-field">
+        <label>Destination *</label>
+        <input type="text" id="editDest" placeholder="e.g. Jaipur" />
+      </div>
+      <div class="edit-field">
+        <label>Budget (per day in ₹)</label>
+        <select id="editBudget">
+          <option value="">Select budget range</option>
+          <option value="budget">Budget (₹500–1500)</option>
+          <option value="mid-range">Mid-Range (₹1500–5000)</option>
+          <option value="premium">Premium (₹5000–15000)</option>
+          <option value="luxury">Luxury (₹15000+)</option>
+        </select>
+      </div>
+      <div class="edit-field">
+        <label>Emergency Contact</label>
+        <input type="tel" id="editEmergency" placeholder="e.g. +91 9876543210" />
+      </div>
+      <div class="edit-field">
+        <label>Accessibility Needs</label>
+        <select id="editAccessibility">
+          <option value="none">None</option>
+          <option value="wheelchair">Wheelchair User</option>
+          <option value="visual">Visual Impairment</option>
+          <option value="hearing">Hearing Impairment</option>
+          <option value="mobility">Limited Mobility</option>
+          <option value="elderly">Elderly / Senior Citizen</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="edit-field">
+        <label>Special Notes</label>
+        <textarea id="editNotes" placeholder="e.g. Need wheelchair ramp at all stops, prefer ground-floor hotel rooms" rows="2"></textarea>
+      </div>
+      <div class="edit-actions">
+        <button class="edit-save-btn" onclick="saveProfile()"><i class="fas fa-check"></i> Save</button>
+        <button class="edit-cancel-btn" onclick="toggleEditProfile(false)"><i class="fas fa-times"></i> Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP RATING MODAL -->
+  <div class="rating-overlay" id="ratingOverlay" style="display:none">
+    <div class="rating-modal">
+      <button class="rating-close" onclick="closeRating()"><i class="fas fa-times"></i></button>
+      <div class="rating-header">
+        <div class="rating-app-icon">🕉️</div>
+        <h3>Rate YatraSaathi</h3>
+        <p>Your feedback helps us make travel safer for everyone</p>
+      </div>
+      <div class="rating-stars" id="ratingStars">
+        <span class="star" data-star="1" onclick="setRating(1)">★</span>
+        <span class="star" data-star="2" onclick="setRating(2)">★</span>
+        <span class="star" data-star="3" onclick="setRating(3)">★</span>
+        <span class="star" data-star="4" onclick="setRating(4)">★</span>
+        <span class="star" data-star="5" onclick="setRating(5)">★</span>
+      </div>
+      <p class="rating-label" id="ratingLabel">Tap a star to rate</p>
+      <textarea class="rating-review" id="ratingReview" placeholder="Tell us what you loved or what we can improve... (optional)" rows="4"></textarea>
+      <div class="rating-tags" id="ratingTags">
+        <button class="rating-tag" onclick="toggleRatingTag(this)">🗺️ Great Maps</button>
+        <button class="rating-tag" onclick="toggleRatingTag(this)">🌐 Useful Translator</button>
+        <button class="rating-tag" onclick="toggleRatingTag(this)">🤖 Helpful Chatbot</button>
+        <button class="rating-tag" onclick="toggleRatingTag(this)">🛡️ Feels Safe</button>
+        <button class="rating-tag" onclick="toggleRatingTag(this)">📱 Easy to Use</button>
+        <button class="rating-tag" onclick="toggleRatingTag(this)">🔊 Voice Features</button>
+      </div>
+      <button class="rating-submit" onclick="submitRating()">
+        <i class="fas fa-paper-plane"></i> Submit Feedback
+      </button>
+    </div>
+  </div>
+
+  <!-- RATING FAB BUTTON -->
+  <button class="rating-fab" id="ratingFab" onclick="openRating()" title="Rate YatraSaathi">
+    <i class="fas fa-star"></i>
+  </button>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-content">
+      <div>
+        <div class="footer-brand">🕉 YatraSaathi</div>
+        <p style="font-size:0.85rem;line-height:1.6" data-i18n="footer_desc">Making India safer and more accessible for every tourist. From the Himalayas to the Indian Ocean, we've got your back.</p>
+      </div>
+      <div>
+        <h4 data-i18n="footer_quick">Quick Links</h4>
+        <ul>
+          <li><a href="#features" data-i18n="nav_features">Features</a></li>
+          <li><a href="#map-section" data-i18n="nav_map">Live Map</a></li>
+          <li><a href="#danger-zones" data-i18n="nav_zones">Danger Zones</a></li>
+          <li><a href="#emergency" data-i18n="nav_emergency">Emergency</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-i18n="footer_helplines">Helplines</h4>
+        <ul>
+          <li><a href="tel:112">112 — Emergency</a></li>
+          <li><a href="tel:1363">1363 — Tourist Helpline</a></li>
+          <li><a href="tel:181">181 — Women Helpline</a></li>
+          <li><a href="tel:108">108 — Ambulance</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 YatraSaathi. Made with ❤️ for Incredible India. | <span data-i18n="footer_motto">Safe Travels, Happy Memories.</span></p>
+    </div>
+  </footer>
+
+  <!-- AI CHATBOT -->
+  <button class="chatbot-btn" id="chatbotBtn" onclick="toggleChatbot()">
+    <i class="fas fa-robot"></i>
+    <span class="chat-badge">1</span>
+  </button>
+  <div class="chatbot-panel" id="chatbotPanel">
+    <div class="chat-header">
+      <div>
+        <h3><i class="fas fa-robot"></i> YatraGuide AI</h3>
+        <small>Your personal India travel assistant</small>
+      </div>
+      <button onclick="toggleChatbot()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-area">
+      <input type="text" id="chatInput" placeholder="Ask me anything about India..." onkeydown="if(event.key==='Enter')sendChat()" />
+      <button onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <!-- NOTIFICATION BELL & PANEL -->
+  <button class="notif-bell" id="notifBell" onclick="toggleNotifPanel()">
+    <i class="fas fa-bell"></i>
+    <span class="notif-badge" id="notifBadge" style="display:none">0</span>
+  </button>
+  <div class="notif-panel" id="notifPanel">
+    <div class="notif-header">
+      <h3><i class="fas fa-bell"></i> Alerts & Notifications</h3>
+      <div style="display:flex;gap:6px">
+        <button onclick="clearAllNotifs()">Clear All</button>
+        <button onclick="toggleNotifPanel()"><i class="fas fa-times"></i></button>
+      </div>
+    </div>
+    <div class="notif-summary-bar" id="notifSummary">
+      <div class="notif-summary-item"><span class="notif-summary-dot" style="background:var(--danger)"></span> <span id="countSafety">0</span> Safety</div>
+      <div class="notif-summary-item"><span class="notif-summary-dot" style="background:#1976d2"></span> <span id="countWeather">0</span> Weather</div>
+      <div class="notif-summary-item"><span class="notif-summary-dot" style="background:#7b1fa2"></span> <span id="countAccess">0</span> Access</div>
+      <div class="notif-summary-item"><span class="notif-summary-dot" style="background:#f57c00"></span> <span id="countCrowd">0</span> Crowd</div>
+    </div>
+    <div class="notif-tabs">
+      <button class="notif-tab active" onclick="switchNotifTab('all',this)">All</button>
+      <button class="notif-tab" onclick="switchNotifTab('weather',this)">🌦️ Weather</button>
+      <button class="notif-tab" onclick="switchNotifTab('safety',this)">🛡️ Safety</button>
+      <button class="notif-tab" onclick="switchNotifTab('accessibility',this)">♿ Access</button>
+      <button class="notif-tab" onclick="switchNotifTab('crowding',this)">👥 Crowd</button>
+    </div>
+    <div class="notif-body">
+      <div class="notif-list active" id="notifListAll"></div>
+      <div class="notif-list" id="notifListWeather"></div>
+      <div class="notif-list" id="notifListSafety"></div>
+      <div class="notif-list" id="notifListAccess"></div>
+      <div class="notif-list" id="notifListCrowd"></div>
+    </div>
+  </div>
+
+  <!-- POPUP BANNER (emergency overlay) -->
+  <div class="popup-banner" id="popupBanner">
+    <span class="popup-icon" id="popupIcon">⚠️</span>
+    <div class="popup-text">
+      <strong id="popupTitle">Weather Alert</strong>
+      <p id="popupDesc">Heavy rainfall expected in your area.</p>
+    </div>
+    <button class="popup-close" onclick="closePopupBanner()"><i class="fas fa-times"></i></button>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
